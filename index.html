@@ -7,8 +7,29 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.cdnfonts.com/css/nonchalance" rel="stylesheet" />
   <style>
+    @font-face {
+      font-family: "Nonchalance";
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("assets/fonts/Nonchalance-Regular.woff") format("woff");
+    }
+    @font-face {
+      font-family: "Nonchalance";
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url("assets/fonts/Nonchalance-Medium.woff") format("woff");
+    }
+    @font-face {
+      font-family: "Nonchalance";
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+      src: url("assets/fonts/Nonchalance-Bold.woff") format("woff");
+    }
+
     :root {
       --dark: #151121;
       --darker: #100c1b;
@@ -231,50 +252,94 @@
     .hero__grid {
       position: relative;
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
       gap: 24px;
       align-items: center;
       max-width: var(--max);
       margin-inline: auto;
       padding-inline: var(--pad);
+      min-height: clamp(360px, 42vw, 422px);
     }
-    .hero__copy { display: flex; flex-direction: column; gap: 31px; max-width: 640px; z-index: 1; }
+    .hero__copy {
+      display: flex;
+      flex-direction: column;
+      gap: 31px;
+      max-width: 640px;
+      z-index: 2;
+    }
     .hero h1 {
       font-family: var(--font-display);
       font-weight: 400;
       font-size: clamp(36px, 5vw, 56px);
-      line-height: 1.1;
+      line-height: 1.09;
       letter-spacing: -1.28px;
       color: #000;
       text-shadow: 0 0 10px rgba(225, 255, 0, 0.3);
+      max-width: 636px;
     }
-    .hero h1 .hl { color: var(--orange); font-weight: 700; }
+    .hero h1 .hl {
+      color: var(--orange);
+      font-weight: 700;
+    }
     .hero__body {
+      font-family: var(--font-body);
+      font-weight: 400;
       font-size: 18px;
       line-height: 26px;
       color: var(--dark);
       max-width: 648px;
     }
     .hero__actions { display: flex; flex-direction: column; gap: 24px; padding-top: 8px; }
-    .hero__hiring {
-      font-size: 14px;
+    .hero__actions .btn {
+      width: fit-content;
+      min-width: 0;
+      height: auto;
+      padding: 12px 24px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
       letter-spacing: 1.2px;
+      text-transform: uppercase;
+      border-radius: 9999px;
+    }
+    .hero__hiring {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1;
+      letter-spacing: 0;
       color: var(--dark);
+      text-transform: uppercase;
     }
     .hero__visual {
       position: relative;
-      justify-self: end;
+      justify-self: stretch;
+      align-self: stretch;
+      min-height: clamp(320px, 40vw, 422px);
+      z-index: 1;
+    }
+    .hero__visual-orb {
+      position: absolute;
+      inset: 10% 0 auto auto;
       width: min(100%, 420px);
       aspect-ratio: 1;
       border-radius: 50%;
-      overflow: hidden;
-      z-index: 1;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.08);
+      pointer-events: none;
     }
     .hero__visual img {
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      left: 50%;
+      bottom: -18%;
+      transform: translateX(-42%);
+      width: min(148%, 632px);
+      height: auto;
+      max-width: none;
       object-fit: cover;
       object-position: center top;
+      pointer-events: none;
+      user-select: none;
     }
 
     /* ——— CULTURE CARDS ——— */
@@ -1112,12 +1177,24 @@
 
     /* ——— RESPONSIVE ——— */
     @media (max-width: 1024px) {
-      .hero__grid { grid-template-columns: 1fr; }
+      .hero__grid {
+        grid-template-columns: 1fr;
+        min-height: 0;
+      }
       .hero__visual {
         order: -1;
-        width: min(70%, 320px);
+        width: min(72%, 360px);
+        min-height: 360px;
         justify-self: center;
+        margin-inline: auto;
       }
+      .hero__visual img {
+        left: 50%;
+        bottom: -8%;
+        transform: translateX(-50%);
+        width: 115%;
+      }
+      .hero__actions .btn { width: 100%; }
       .support__layout,
       .apply-faq__grid { grid-template-columns: 1fr; gap: 40px; }
       .bento-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1167,8 +1244,8 @@
   <!-- Top Nav -->
   <header class="nav">
     <div class="nav__inner">
-      <a class="nav__logo" href="#top" aria-label="N Natural Hair Studio">
-        <img src="assets/logo-white.png" alt="n-natural" width="146" height="39" />
+      <a class="nav__logo" href="https://www.nnaturalhairstudio.com/" aria-label="N Natural Hair Studio home" target="_blank" rel="noopener noreferrer">
+        <img src="assets/logo-white.png" alt="n the clinic" width="146" height="39" />
       </a>
       <nav class="nav__links" id="navLinks" aria-label="Page sections">
         <a href="#culture" class="is-active">CULTURE</a>
@@ -1203,7 +1280,8 @@
           </div>
         </div>
         <div class="hero__visual reveal">
-          <img src="assets/hero-portrait.png" alt="Stylist with long lavender braids" width="420" height="420" />
+          <div class="hero__visual-orb" aria-hidden="true"></div>
+          <img src="assets/hero-portrait.png" alt="Stylist with long lavender braids" width="632" height="1133" />
         </div>
       </div>
     </section>
