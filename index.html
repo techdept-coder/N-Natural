@@ -255,8 +255,7 @@
       position: relative;
       background: var(--lavender);
       overflow: hidden;
-      padding-block: clamp(24px, 4vw, 48px) 0;
-      min-height: min(92vh, 920px);
+      min-height: clamp(620px, 78vh, 820px);
     }
     .hero__glow {
       position: absolute;
@@ -285,28 +284,28 @@
     }
     .hero__grid {
       position: relative;
+      z-index: 2;
       display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.35fr);
-      gap: clamp(8px, 1.5vw, 20px);
-      align-items: stretch;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+      align-items: center;
       max-width: var(--max);
       margin-inline: auto;
       padding-inline: var(--pad);
-      min-height: min(84vh, 860px);
+      padding-block: clamp(64px, 8vw, 124px);
+      min-height: clamp(620px, 78vh, 820px);
     }
     .hero__copy {
       display: flex;
       flex-direction: column;
-      gap: clamp(20px, 3vw, 31px);
-      max-width: 640px;
+      gap: 31px;
+      max-width: min(640px, 48%);
       z-index: 2;
-      padding-block: clamp(32px, 5vw, 72px) clamp(48px, 8vw, 96px);
-      align-self: center;
     }
     .hero h1 {
       font-family: var(--font-display);
       font-weight: 400;
-      font-size: clamp(32px, 4.6vw, 56px);
+      font-size: clamp(36px, 4.2vw, 56px);
       line-height: 1.09;
       letter-spacing: -1.28px;
       color: #000;
@@ -320,17 +319,17 @@
     .hero__body {
       font-family: var(--font-body);
       font-weight: 400;
-      font-size: clamp(15px, 1.5vw, 18px);
-      line-height: 1.45;
+      font-size: 18px;
+      line-height: 26px;
       color: var(--dark);
-      max-width: 648px;
+      max-width: 520px;
     }
-    .hero__actions { display: flex; flex-direction: column; gap: 24px; padding-top: 8px; }
+    .hero__actions { display: flex; flex-direction: column; gap: 24px; padding-top: 17px; }
     .hero__actions .btn {
       width: fit-content;
       min-width: 0;
       height: auto;
-      padding: 12px 24px;
+      padding: 16px 32px;
       font-family: var(--font-display);
       font-weight: 700;
       font-size: 12px;
@@ -339,63 +338,52 @@
       border-radius: 9999px;
     }
     .hero__hiring {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 12px;
-      line-height: 1.3;
-      letter-spacing: 0;
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 1.2;
+      letter-spacing: 1.2px;
       color: var(--dark);
       text-transform: uppercase;
     }
+    /* Full-height right portrait — matches Figma scale */
     .hero__visual {
-      position: relative;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(58%, 780px);
       z-index: 1;
-      display: flex;
-      align-items: flex-end;
-      justify-content: flex-end;
-      width: 100%;
-      height: 100%;
-      min-height: min(84vh, 860px);
-      overflow: visible;
-      margin-right: calc(var(--pad) * -0.35);
+      pointer-events: none;
     }
     .hero__visual-orb {
       position: absolute;
-      right: 4%;
-      top: 4%;
-      left: auto;
-      transform: none;
-      width: min(92%, 680px);
+      right: 6%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: min(70%, 420px);
       aspect-ratio: 1;
       border-radius: 50%;
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
       pointer-events: none;
       animation: hero-orb-pulse 7s ease-in-out infinite;
     }
     .hero__visual img {
-      position: relative;
-      z-index: 1;
-      display: block;
-      width: min(145%, 860px);
-      height: auto;
-      max-height: min(92vh, 900px);
+      position: absolute;
+      right: -4%;
+      bottom: 0;
+      top: auto;
+      height: 108%;
+      width: auto;
+      max-width: none;
       object-fit: contain;
       object-position: right bottom;
       pointer-events: none;
       user-select: none;
-      margin-bottom: -2%;
-    }
-    .hero__visual.reveal.is-visible img {
-      animation: hero-portrait-drift 8s ease-in-out infinite;
     }
     @keyframes hero-orb-pulse {
-      0%, 100% { transform: scale(1); opacity: 0.75; }
-      50% { transform: scale(1.05); opacity: 1; }
-    }
-    @keyframes hero-portrait-drift {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
+      0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.75; }
+      50% { transform: translateY(-50%) scale(1.03); opacity: 0.95; }
     }
 
     /* ——— CULTURE CARDS ——— */
@@ -1380,68 +1368,66 @@
 
     /* ——— RESPONSIVE ——— */
     @media (max-width: 1100px) {
-      .hero {
-        min-height: min(88vh, 820px);
-      }
+      .hero,
       .hero__grid {
-        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.2fr);
-        min-height: min(80vh, 780px);
+        min-height: clamp(560px, 72vh, 720px);
+      }
+      .hero__copy {
+        max-width: min(520px, 46%);
       }
       .hero__visual {
-        min-height: min(80vh, 780px);
-        margin-right: 0;
+        width: min(56%, 640px);
       }
       .hero__visual img {
-        width: min(130%, 720px);
-        max-height: min(86vh, 780px);
-      }
-      .hero__visual-orb {
-        width: min(95%, 560px);
+        height: 105%;
+        right: -2%;
       }
     }
 
     @media (max-width: 900px) {
       .hero {
-        padding-block: clamp(32px, 5vw, 48px) clamp(24px, 4vw, 40px);
         min-height: 0;
+        display: flex;
+        flex-direction: column;
       }
       .hero__grid {
-        grid-template-columns: 1fr;
+        order: 2;
         min-height: 0;
-        align-items: center;
-        gap: 12px;
+        padding-block: 28px 40px;
       }
       .hero__copy {
-        order: 2;
-        padding-block: 0;
         max-width: none;
-        text-align: left;
+      }
+      .hero__body {
+        max-width: none;
       }
       .hero__visual {
+        position: relative;
         order: 1;
-        width: min(100%, 580px);
-        min-height: 0;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        width: min(100%, 440px);
+        height: auto;
         aspect-ratio: 3 / 4;
-        max-height: 720px;
-        justify-self: center;
-        justify-content: center;
-        margin-inline: auto;
-        margin-right: auto;
+        max-height: 520px;
+        margin: 0 auto;
         overflow: hidden;
       }
       .hero__visual-orb {
-        width: min(96%, 520px);
-        top: 4%;
+        width: min(88%, 360px);
+        top: 12%;
         right: auto;
         left: 50%;
         transform: translateX(-50%);
+        animation: none;
       }
       .hero__visual img {
+        position: absolute;
+        inset: 0;
         width: 100%;
-        max-width: 100%;
-        max-height: 100%;
         height: 100%;
-        margin-bottom: 0;
+        right: auto;
         object-fit: contain;
         object-position: center bottom;
       }
@@ -1485,9 +1471,12 @@
       .nav__toggle { display: inline-flex; }
       .hero h1 { font-size: clamp(30px, 9vw, 40px); }
       .hero__visual {
-        width: min(100%, 480px);
+        width: min(100%, 360px);
         aspect-ratio: 3 / 4;
-        max-height: 620px;
+        max-height: 460px;
+      }
+      .hero__visual-orb {
+        animation: none;
       }
       .bento__photo {
         max-height: 280px;
@@ -1533,7 +1522,6 @@
       }
       .accent-bar { transform: none; transition: none; }
       .hero__visual-orb,
-      .hero__visual.reveal.is-visible img,
       .final-cta__glow,
       .bento-card.reveal.is-visible,
       .bento-card.reveal.is-visible:hover {
@@ -1590,10 +1578,10 @@
             <p class="hero__hiring">HIRING NOW IN SILVER SPRING, MD AND BROOKLYN, NY</p>
           </div>
         </div>
-        <div class="hero__visual reveal reveal--right">
-          <div class="hero__visual-orb" aria-hidden="true"></div>
-          <img src="assets/hero-portrait.png" alt="Stylist with long lavender braids" width="632" height="1133" />
-        </div>
+      </div>
+      <div class="hero__visual reveal reveal--right">
+        <div class="hero__visual-orb" aria-hidden="true"></div>
+        <img src="assets/hero-portrait.png" alt="Stylist with long lavender braids" width="632" height="1133" />
       </div>
     </section>
 
