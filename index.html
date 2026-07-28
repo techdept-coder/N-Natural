@@ -1401,16 +1401,27 @@
         margin-top: -32px;
         padding-top: 0;
         padding-bottom: 40px;
+        width: 100%;
+        min-width: 0;
       }
       .hero__copy {
         max-width: none;
+        width: 100%;
+        min-width: 0;
       }
       .hero h1 {
-        white-space: nowrap;
-        font-size: clamp(28px, 7.2vw, 40px);
+        white-space: normal;
+        width: 100%;
+        max-width: 100%;
+        font-size: clamp(24px, 6.5vw, 36px);
       }
       .hero__body {
         max-width: none;
+      }
+      .hero__hiring {
+        font-size: 11px;
+        letter-spacing: 0.6px;
+        line-height: 1.35;
       }
       .hero__visual {
         position: relative;
@@ -1489,7 +1500,9 @@
         right: var(--pad);
       }
       .nav__toggle { display: inline-flex; }
-      .hero h1 { font-size: clamp(30px, 9vw, 40px); }
+      .hero h1 {
+        font-size: clamp(22px, 6.2vw, 30px);
+      }
       .hero__visual {
         width: min(100%, 360px);
         aspect-ratio: 3 / 4;
@@ -1586,10 +1599,10 @@
       <div class="hero__grid">
         <div class="hero__copy reveal reveal--left">
           <h1>
-            Natural&nbsp;Hair<br />
-            Stylist&nbsp;Jobs&nbsp;Where<br />
-            Your&nbsp;<span class="hl">Career</span>&nbsp;Is<br />
-            Actually&nbsp;<span class="hl">Built</span>
+            Natural Hair<br />
+            Stylist Jobs Where<br />
+            Your <span class="hl">Career</span> Is<br />
+            Actually <span class="hl">Built</span>
           </h1>
           <p class="hero__body">
             You came into this work because you love natural hair. But loving the craft isn't enough if the environment drains you. You need a salon that respects your time, pays you what you're worth, and gives you the tools to grow without burning out.
