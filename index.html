@@ -2032,7 +2032,7 @@
           <div class="form-grid">
             <div class="form-field">
               <label for="localToMaryland">Are you local to Maryland or nearby?</label>
-              <select id="localToMaryland" name="localToMaryland" required>
+              <select id="localToMaryland" name="localToMaryland">
                 <option value="">Select one</option>
                 <option value="Yes">Yes</option>
                 <option value="Relocating">Relocating</option>
@@ -2041,7 +2041,7 @@
             </div>
             <div class="form-field">
               <label for="availableToStart">How soon are you available to start?</label>
-              <select id="availableToStart" name="availableToStart" required>
+              <select id="availableToStart" name="availableToStart">
                 <option value="">Select one</option>
                 <option value="Immediately">Immediately</option>
                 <option value="2 weeks">2 weeks</option>
@@ -2059,7 +2059,7 @@
                 <label class="checkbox-item"><input type="checkbox" name="availability" value="Flexible schedule" /> Flexible schedule</label>
               </div>
             </div>
-            <div class="form-field form-field--span2" id="compFieldAdmin">
+            <div class="form-field form-field--span2" id="compFieldAdmin" hidden>
               <label for="compensationOkAdmin">Are you comfortable with a part-time role at $22/hr plus a $40 gas allowance for in-person support?</label>
               <select id="compensationOkAdmin" name="compensationOkAdmin">
                 <option value="">Select one</option>
@@ -2068,7 +2068,7 @@
                 <option value="Prefer to discuss">Prefer to discuss</option>
               </select>
             </div>
-            <div class="form-field form-field--span2" id="compFieldGeneric" hidden>
+            <div class="form-field form-field--span2" id="compFieldGeneric">
               <label for="compensationOkGeneric">Are you comfortable with the posted compensation for this role?</label>
               <select id="compensationOkGeneric" name="compensationOkGeneric">
                 <option value="">Select one</option>
@@ -2085,7 +2085,7 @@
           <div class="form-grid">
             <div class="form-field">
               <label for="yearsExperience">Years of relevant experience</label>
-              <select id="yearsExperience" name="yearsExperience" required>
+              <select id="yearsExperience" name="yearsExperience">
                 <option value="">Select one</option>
                 <option value="Less than 1">Less than 1</option>
                 <option value="1–2">1–2</option>
@@ -2095,7 +2095,7 @@
             </div>
             <div class="form-field">
               <label for="tools">Tools you have used</label>
-              <input type="text" id="tools" name="tools" placeholder="Google Calendar, Gmail, Excel, Canva, etc." required />
+              <input type="text" id="tools" name="tools" placeholder="Google Calendar, Gmail, Excel, Canva, etc." />
             </div>
             <div class="form-field form-field--span2">
               <span class="label">Which areas have you supported before?</span>
@@ -2116,15 +2116,15 @@
           <div class="form-grid form-grid--full">
             <div class="form-field">
               <label for="fitWhy">Why does this role feel like a good fit for you?</label>
-              <textarea id="fitWhy" name="fitWhy" placeholder="Share a short answer in 3 to 5 sentences." required></textarea>
+              <textarea id="fitWhy" name="fitWhy" placeholder="Share a short answer in 3 to 5 sentences."></textarea>
             </div>
             <div class="form-field">
               <label for="prioritizeTasks">A business owner gives you five tasks at once. How would you organize and prioritize them?</label>
-              <textarea id="prioritizeTasks" name="prioritizeTasks" placeholder="Share how you would think through the situation." required></textarea>
+              <textarea id="prioritizeTasks" name="prioritizeTasks" placeholder="Share how you would think through the situation."></textarea>
             </div>
             <div class="form-field">
               <label for="organizedExample">Describe a time you helped someone stay organized or followed through on important details.</label>
-              <textarea id="organizedExample" name="organizedExample" placeholder="Share a real example." required></textarea>
+              <textarea id="organizedExample" name="organizedExample" placeholder="Share a real example."></textarea>
             </div>
           </div>
         </div>
@@ -2143,7 +2143,7 @@
             </div>
             <div class="form-field">
               <label for="openToCall">Are you open to a short introductory call?</label>
-              <select id="openToCall" name="openToCall" required>
+              <select id="openToCall" name="openToCall">
                 <option value="">Select one</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
@@ -2151,7 +2151,7 @@
             </div>
             <div class="form-field">
               <label for="referencesAvailable">Professional references available upon request?</label>
-              <select id="referencesAvailable" name="referencesAvailable" required>
+              <select id="referencesAvailable" name="referencesAvailable">
                 <option value="">Select one</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
@@ -2501,15 +2501,13 @@
         if (job.isAdmin) {
           adminComp.hidden = false;
           genericComp.hidden = true;
-          adminSelect.required = true;
-          genericSelect.required = false;
+          adminSelect.value = "";
           genericSelect.value = "";
         } else {
           adminComp.hidden = true;
           genericComp.hidden = false;
-          adminSelect.required = false;
-          genericSelect.required = true;
           adminSelect.value = "";
+          genericSelect.value = "";
         }
 
         closeOverlay(detailModal);
@@ -2558,18 +2556,21 @@
         if (wrap) wrap.classList.add("is-invalid");
       }
 
+      var REQUIRED_FIELDS = ["fullName", "email", "phone", "cityState"];
+
       function validateForm() {
         clearInvalid();
         var ok = true;
-        applyForm.querySelectorAll("[required]").forEach(function (field) {
-          if (field.disabled || field.closest("[hidden]")) return;
+        REQUIRED_FIELDS.forEach(function (id) {
+          var field = document.getElementById(id);
+          if (!field || field.closest("[hidden]")) return;
           if (!field.value || !String(field.value).trim()) {
             markInvalid(field);
             ok = false;
           }
         });
         var email = document.getElementById("email");
-        if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        if (email && email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
           markInvalid(email);
           ok = false;
         }
@@ -2616,7 +2617,7 @@
         formError.textContent = "";
 
         if (!validateForm()) {
-          formError.textContent = "Please fill in all required fields.";
+          formError.textContent = "Please fill in your name, email, phone, and city/state.";
           formError.classList.add("is-visible");
           return;
         }
