@@ -1337,7 +1337,9 @@
     }
     .final-cta h2 .hl { color: var(--orange); display: block; }
     .final-cta p {
-      font-size: 18px;
+      max-width: 768px;
+      margin-inline: auto;
+      font-size: 16px;
       line-height: 21px;
       letter-spacing: -0.5px;
       color: var(--ink);
@@ -1396,7 +1398,9 @@
       .hero__grid {
         order: 2;
         min-height: 0;
-        padding-block: 28px 40px;
+        margin-top: -32px;
+        padding-top: 0;
+        padding-bottom: 40px;
       }
       .hero__copy {
         max-width: none;
@@ -1437,6 +1441,15 @@
       .hero__visual img {
         object-fit: contain;
         object-position: center bottom;
+      }
+      .hero__visual::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0;
+        height: 45%;
+        background: linear-gradient(to bottom, transparent 0%, var(--lavender) 100%);
+        pointer-events: none;
+        z-index: 2;
       }
       .hero__actions .btn { width: 100%; max-width: 360px; }
       .support__layout,
@@ -1948,7 +1961,9 @@
           Where Your Craft<br />Comes First
         </h2>
         <p>
-          You do not have to choose between doing great work and being supported while you do it. Here, you get both: the freedom to focus on your craft and a team that has your back on everything else.
+          You do not have to choose between doing great work and being supported while you do it.<br />
+          Here, you get both: the freedom to focus on your craft and a team that has<br />
+          your back on everything else.
         </p>
         <a class="btn btn--lime btn--lg" href="#roles">View open roles and apply</a>
       </div>
