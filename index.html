@@ -380,6 +380,25 @@
     }
     .culture-grid .card {
       flex: 0 1 350px;
+      cursor: default;
+      transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease,
+        background-color 0.45s ease,
+        border-color 0.45s ease,
+        color 0.45s ease;
+    }
+    .culture-grid .card .card__title,
+    .culture-grid .card .card__body,
+    .culture-grid .card .card__icon {
+      transition: color 0.45s ease, background-color 0.45s ease;
+    }
+    .culture-grid .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 40px rgba(224, 75, 0, 0.1);
+    }
+    .culture-grid .card.card--dark:hover {
+      box-shadow: 0 24px 40px rgba(21, 17, 33, 0.35);
     }
 
     .card {
@@ -396,12 +415,9 @@
       min-height: 320px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 24px 40px rgba(224, 75, 0, 0.1);
-    }
     .card--dark {
       background: var(--dark);
+      border-color: var(--dark);
       color: var(--white);
     }
     .card--dark .card__title { color: var(--white); }
@@ -430,6 +446,15 @@
       color: var(--muted);
     }
     .card__body strong { color: inherit; font-weight: 700; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .culture-grid .card,
+      .culture-grid .card .card__title,
+      .culture-grid .card .card__body,
+      .culture-grid .card .card__icon {
+        transition: none;
+      }
+    }
 
     /* ——— SUPPORT ——— */
     .support__layout {
@@ -1453,7 +1478,7 @@
               A well-reviewed, established <strong>Silver Spring salon,</strong> now growing into <strong>Brooklyn, NY.</strong>
             </p>
           </article>
-          <article class="card card--dark reveal">
+          <article class="card reveal">
             <div class="card__icon">
               <img src="assets/icon-wisdom.svg" alt="" width="30" height="15" />
             </div>
@@ -2567,6 +2592,69 @@
       } else {
         revealEls.forEach(function (el) { el.classList.add("is-visible"); });
       }
+
+      // Culture cards: auto-cycle highlight, hover overrides
+      (function () {
+        var grid = document.querySelector(".culture-grid");
+        if (!grid) return;
+        var cards = Array.prototype.slice.call(grid.querySelectorAll(".card"));
+        if (!cards.length) return;
+
+        var index = 0;
+        var timer = null;
+        var paused = false;
+        var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var INTERVAL_MS = 2800;
+
+        function setActive(i) {
+          index = ((i % cards.length) + cards.length) % cards.length;
+          cards.forEach(function (card, n) {
+            card.classList.toggle("card--dark", n === index);
+          });
+        }
+
+        function next() {
+          if (paused) return;
+          setActive(index + 1);
+        }
+
+        function start() {
+          if (reduceMotion || timer) return;
+          timer = window.setInterval(next, INTERVAL_MS);
+        }
+
+        function stop() {
+          if (!timer) return;
+          window.clearInterval(timer);
+          timer = null;
+        }
+
+        cards.forEach(function (card, i) {
+          card.addEventListener("mouseenter", function () {
+            paused = true;
+            stop();
+            setActive(i);
+          });
+          card.addEventListener("focusin", function () {
+            paused = true;
+            stop();
+            setActive(i);
+          });
+        });
+
+        grid.addEventListener("mouseleave", function () {
+          paused = false;
+          start();
+        });
+        grid.addEventListener("focusout", function (e) {
+          if (grid.contains(e.relatedTarget)) return;
+          paused = false;
+          start();
+        });
+
+        setActive(1);
+        start();
+      })();
     })();
   </script>
 </body>
