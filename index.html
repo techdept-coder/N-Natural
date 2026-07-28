@@ -193,7 +193,7 @@
       gap: 32px;
     }
     .nav__links a {
-      font-family: var(--font-display);
+      font-family: var(--font-body);
       font-weight: 700;
       font-size: 14px;
       letter-spacing: 1.2px;
@@ -251,11 +251,12 @@
     .nav__toggle span::after { top: 7px; }
 
     /* ——— HERO ——— */
+    /* Figma frame: 1280 × 669.56 → height tracks width (52.31vw), capped at 670px */
     .hero {
       position: relative;
       background: var(--lavender);
       overflow: hidden;
-      min-height: clamp(620px, 78vh, 820px);
+      min-height: min(52.31vw, 670px);
     }
     .hero__glow {
       position: absolute;
@@ -292,25 +293,27 @@
       max-width: var(--max);
       margin-inline: auto;
       padding-inline: var(--pad);
-      padding-block: clamp(64px, 8vw, 124px);
-      min-height: clamp(620px, 78vh, 820px);
+      padding-block: min(9.69vw, 124px); /* Figma: 124px on 1280 frame */
+      min-height: min(52.31vw, 670px);
     }
     .hero__copy {
       display: flex;
       flex-direction: column;
       gap: 31px;
-      max-width: min(640px, 48%);
+      max-width: 740px; /* Figma copy container: 738.66px */
       z-index: 2;
     }
     .hero h1 {
       font-family: var(--font-display);
       font-weight: 400;
-      font-size: clamp(36px, 4.2vw, 56px);
+      font-size: clamp(32px, 4.375vw, 56px); /* 56px at 1280 like Figma */
       line-height: 1.09;
       letter-spacing: -1.28px;
       color: #000;
       text-shadow: 0 0 10px rgba(225, 255, 0, 0.3);
-      max-width: 636px;
+      white-space: nowrap;
+      width: max-content;
+      max-width: none;
     }
     .hero h1 .hl {
       color: var(--orange);
@@ -322,7 +325,7 @@
       font-size: 18px;
       line-height: 26px;
       color: var(--dark);
-      max-width: 520px;
+      max-width: 648px; /* Figma: 648px, 4 lines */
     }
     .hero__actions { display: flex; flex-direction: column; gap: 24px; padding-top: 17px; }
     .hero__actions .btn {
@@ -346,44 +349,54 @@
       color: var(--dark);
       text-transform: uppercase;
     }
-    /* Full-height right portrait — matches Figma scale */
+    /* Portrait — Figma rect: x=640, y=-137, 632×1133 on 1280×669.56 frame.
+       Starts at horizontal center, bleeds past top/bottom; section crops it. */
     .hero__visual {
       position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: min(58%, 780px);
+      left: 50%;
+      top: -10%;
+      width: min(49.375vw, 632px);
+      aspect-ratio: 632 / 1133;
       z-index: 1;
       pointer-events: none;
     }
+    .hero__visual.reveal,
+    .hero__visual.reveal--right,
+    .hero__visual.reveal.is-visible,
+    .hero__visual.reveal--right.is-visible {
+      /* keep opacity/filter reveal; positioning must not use transform */
+      transform: none;
+    }
+    /* Orb — Figma: 357px circle centered at ~(1021, 335) on the frame,
+       expressed relative to the portrait rect */
     .hero__visual-orb {
       position: absolute;
-      right: 6%;
-      top: 50%;
-      transform: translateY(-50%);
-      width: min(70%, 420px);
+      left: 60.3%;
+      top: 41.6%;
+      width: 56.5%;
       aspect-ratio: 1;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.08);
       pointer-events: none;
+      translate: -50% -50%;
       animation: hero-orb-pulse 7s ease-in-out infinite;
+      z-index: 0;
     }
     .hero__visual img {
       position: absolute;
-      right: -4%;
-      bottom: 0;
-      top: auto;
-      height: 108%;
-      width: auto;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       max-width: none;
-      object-fit: contain;
-      object-position: right bottom;
+      object-fit: cover;
+      object-position: center center;
       pointer-events: none;
       user-select: none;
+      z-index: 1;
     }
     @keyframes hero-orb-pulse {
-      0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.75; }
-      50% { transform: translateY(-50%) scale(1.03); opacity: 0.95; }
+      0%, 100% { scale: 1; opacity: 0.75; }
+      50% { scale: 1.03; opacity: 0.95; }
     }
 
     /* ——— CULTURE CARDS ——— */
@@ -659,16 +672,16 @@
     .bento-card--accent .bento-card__num,
     .bento-card--lime .bento-card__num { color: var(--dark); }
     .bento-card__icon {
-      height: 30px;
-      width: auto;
-      max-width: 48px;
+      width: 32px;
+      height: 32px;
       margin-bottom: 8px;
+      flex-shrink: 0;
     }
     .bento-card__icon img {
+      width: 100%;
       height: 100%;
-      width: auto;
-      max-width: 48px;
       object-fit: contain;
+      object-position: left center;
     }
     .bento-card h3 {
       font-family: var(--font-body);
@@ -1368,19 +1381,9 @@
 
     /* ——— RESPONSIVE ——— */
     @media (max-width: 1100px) {
-      .hero,
-      .hero__grid {
-        min-height: clamp(560px, 72vh, 720px);
-      }
+      /* Geometry is % based and scales itself; just keep copy off the portrait */
       .hero__copy {
-        max-width: min(520px, 46%);
-      }
-      .hero__visual {
-        width: min(56%, 640px);
-      }
-      .hero__visual img {
-        height: 105%;
-        right: -2%;
+        max-width: 48%;
       }
     }
 
@@ -1398,36 +1401,40 @@
       .hero__copy {
         max-width: none;
       }
+      .hero h1 {
+        white-space: nowrap;
+        font-size: clamp(28px, 7.2vw, 40px);
+      }
       .hero__body {
         max-width: none;
       }
       .hero__visual {
         position: relative;
         order: 1;
+        left: auto;
         top: auto;
-        right: auto;
         bottom: auto;
-        width: min(100%, 440px);
+        width: min(100%, 400px);
         height: auto;
         aspect-ratio: 3 / 4;
-        max-height: 520px;
+        max-height: 480px;
         margin: 0 auto;
         overflow: hidden;
       }
+      .hero__visual.reveal,
+      .hero__visual.reveal--right,
+      .hero__visual.reveal.is-visible,
+      .hero__visual.reveal--right.is-visible {
+        transform: none;
+      }
       .hero__visual-orb {
-        width: min(88%, 360px);
-        top: 12%;
-        right: auto;
+        width: min(88%, 320px);
+        top: 42%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
         animation: none;
       }
       .hero__visual img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        right: auto;
         object-fit: contain;
         object-position: center bottom;
       }
@@ -1566,9 +1573,10 @@
       <div class="hero__grid">
         <div class="hero__copy reveal reveal--left">
           <h1>
-            Natural Hair Stylist Jobs Where Your
-            <span class="hl">Career</span> Is Actually
-            <span class="hl">Built</span>
+            Natural&nbsp;Hair<br />
+            Stylist&nbsp;Jobs&nbsp;Where<br />
+            Your&nbsp;<span class="hl">Career</span>&nbsp;Is<br />
+            Actually&nbsp;<span class="hl">Built</span>
           </h1>
           <p class="hero__body">
             You came into this work because you love natural hair. But loving the craft isn't enough if the environment drains you. You need a salon that respects your time, pays you what you're worth, and gives you the tools to grow without burning out.
@@ -1581,7 +1589,7 @@
       </div>
       <div class="hero__visual reveal reveal--right">
         <div class="hero__visual-orb" aria-hidden="true"></div>
-        <img src="assets/hero-portrait.png" alt="Stylist with long lavender braids" width="632" height="1133" />
+        <img src="https://res.cloudinary.com/dad2f43c7/image/upload/v1785268251/NNaturalHiringImage_cr5jrj.png" alt="Stylist with long lavender braids" width="632" height="1133" fetchpriority="high" />
       </div>
     </section>
 
@@ -1673,37 +1681,37 @@
           <div class="bento-grid">
             <article class="bento-card reveal">
               <span class="bento-card__num">01</span>
-              <div class="bento-card__icon"><img src="assets/bento-icon-1.svg" alt="" width="40" height="30" /></div>
+              <div class="bento-card__icon"><img src="assets/bento-icon-1.svg" alt="" /></div>
               <h3>support that frees you to be creative and master your craft.</h3>
               <p>HR, marketing, and booking are handled by people whose whole job is exactly that. You spend your day on hair and clients, not on the business tasks that wear stylists down everywhere else.</p>
             </article>
             <article class="bento-card bento-card--accent reveal">
               <span class="bento-card__num">02</span>
-              <div class="bento-card__icon"><img src="assets/bento-icon-2.svg" alt="" width="40" height="30" /></div>
+              <div class="bento-card__icon"><img src="assets/bento-icon-2.svg" alt="" /></div>
               <h3>Training that keeps you sharp</h3>
               <p>You start with paid training, then keep growing through weekly and monthly sessions and our team-wide stylist summit. You leave each week a little better than you came in. That is the whole point.</p>
             </article>
             <article class="bento-card reveal">
               <span class="bento-card__num">03</span>
-              <div class="bento-card__icon"><img src="assets/bento-icon-3.svg" alt="" width="40" height="18" /></div>
+              <div class="bento-card__icon"><img src="assets/bento-icon-3.svg" alt="" /></div>
               <h3>Room to grow into more</h3>
               <p>There are real paths here: management positions, creative spaces, and room to move up. If you want a career and not just a chair to rent, there is one to build with us.</p>
             </article>
             <article class="bento-card reveal">
               <span class="bento-card__num">04</span>
-              <div class="bento-card__icon"><img src="assets/bento-icon-4.svg" alt="" width="40" height="30" /></div>
+              <div class="bento-card__icon"><img src="assets/bento-icon-4.svg" alt="" /></div>
               <h3>Benefits built around real life</h3>
               <p>Flexible scheduling, paid training, career development programs, employee discounts, performance bonuses, and team events. The everyday is set up to keep good people for the long run.</p>
             </article>
             <article class="bento-card bento-card--lime reveal">
               <span class="bento-card__num">05</span>
-              <div class="bento-card__icon"><img src="assets/bento-icon-5.svg" alt="" width="36" height="18" /></div>
+              <div class="bento-card__icon"><img src="assets/bento-icon-5.svg" alt="" /></div>
               <h3>A culture you can feel</h3>
               <p>Accepting. Creative. Memorable. We value teamwork, respect, community, education, and professional growth, and you will see it in how we treat each other, not just in how we write about it.</p>
             </article>
             <article class="bento-card reveal">
               <span class="bento-card__num">06</span>
-              <div class="bento-card__icon"><img src="assets/bento-icon-6.svg" alt="" width="40" height="30" /></div>
+              <div class="bento-card__icon"><img src="assets/bento-icon-6.svg" alt="" /></div>
               <h3>Work that means something</h3>
               <p>We help foster confidence, advocate acceptance of self, and build community. We live in the cross section of beauty and power, where being Black and celebrated is its own kind of freedom. The hair is the craft. The bigger work is the people.</p>
             </article>
