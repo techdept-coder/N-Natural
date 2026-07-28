@@ -1,0 +1,297 @@
+{
+  "name": "N Natural — Careers Application",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "careers-application",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "careers-application"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\n\nconst asList = (v) => {\n  if (Array.isArray(v)) return v.filter(Boolean).join(', ');\n  if (v == null || v === '') return '';\n  return String(v);\n};\n\nconst escapeHtml = (v) =>\n  String(v ?? '')\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;');\n\nconst resume = body.resume && typeof body.resume === 'object' ? body.resume : null;\nconst hasResume = Boolean(resume && resume.base64);\nconst resumeFileName = resume?.fileName || '';\nconst resumeMimeType = resume?.mimeType || 'application/octet-stream';\n\nconst data = {\n  submittedAt: body.submittedAt || new Date().toISOString(),\n  role: body.role || '',\n  fullName: body.fullName || '',\n  email: body.email || '',\n  phone: body.phone || '',\n  cityState: body.cityState || '',\n  localToMaryland: body.localToMaryland || '',\n  availableToStart: body.availableToStart || '',\n  availability: asList(body.availability),\n  compensationOk: body.compensationOk || '',\n  yearsExperience: body.yearsExperience || '',\n  tools: body.tools || '',\n  supportedAreas: asList(body.supportedAreas),\n  fitWhy: body.fitWhy || '',\n  prioritizeTasks: body.prioritizeTasks || '',\n  organizedExample: body.organizedExample || '',\n  linkedin: body.linkedin || '',\n  openToCall: body.openToCall || '',\n  referencesAvailable: body.referencesAvailable || '',\n  resumeFileName,\n  resumeMimeType,\n  hasResume,\n};\n\nconst e = Object.fromEntries(\n  Object.entries(data).map(([k, v]) => [k, escapeHtml(v)])\n);\n\nconst row = (label, value) =>\n  `<tr><td style=\"padding:8px 12px;border-bottom:1px solid #eee;color:#666;width:38%;vertical-align:top;\">${label}</td><td style=\"padding:8px 12px;border-bottom:1px solid #eee;color:#151121;vertical-align:top;\">${value || '—'}</td></tr>`;\n\ndata.internalHtml = `<!DOCTYPE html><html><body style=\"margin:0;padding:0;background:#f6f3fb;font-family:Arial,Helvetica,sans-serif;\">\n  <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f6f3fb;padding:32px 16px;\">\n    <tr><td align=\"center\">\n      <table role=\"presentation\" width=\"640\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #d1c4e9;\">\n        <tr><td style=\"background:#151121;padding:20px 28px;color:#fff;font-size:14px;letter-spacing:1px;\">N NATURAL HAIR STUDIO · CAREERS</td></tr>\n        <tr><td style=\"padding:28px;\">\n          <p style=\"margin:0 0 8px;font-size:13px;color:#e04b00;font-weight:bold;text-transform:uppercase;letter-spacing:1px;\">New application</p>\n          <h1 style=\"margin:0 0 16px;font-size:28px;line-height:1.2;color:#151121;\">${e.fullName}</h1>\n          <p style=\"display:inline-block;margin:0 0 24px;padding:8px 14px;border-radius:999px;background:#e1ff00;color:#1a1626;font-size:13px;font-weight:bold;\">${e.role || 'Open role'}</p>\n          <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"border:1px solid #eee;border-radius:12px;overflow:hidden;\">\n            ${row('Submitted', e.submittedAt)}\n            ${row('Email', e.email)}\n            ${row('Phone', e.phone)}\n            ${row('City / State', e.cityState)}\n            ${row('Local to Maryland', e.localToMaryland)}\n            ${row('Available to start', e.availableToStart)}\n            ${row('Availability', e.availability)}\n            ${row('Compensation OK', e.compensationOk)}\n            ${row('Years experience', e.yearsExperience)}\n            ${row('Tools', e.tools)}\n            ${row('Supported areas', e.supportedAreas)}\n            ${row('LinkedIn', e.linkedin)}\n            ${row('Open to intro call', e.openToCall)}\n            ${row('References available', e.referencesAvailable)}\n            ${row('Resume', e.resumeFileName || (data.hasResume ? 'Attached' : 'Not provided'))}\n          </table>\n          <h2 style=\"margin:28px 0 8px;font-size:18px;color:#e04b00;\">Short answers</h2>\n          <p style=\"margin:0 0 4px;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:0.5px;\">Why this role</p>\n          <p style=\"margin:0 0 16px;color:#151121;white-space:pre-wrap;\">${e.fitWhy || '—'}</p>\n          <p style=\"margin:0 0 4px;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:0.5px;\">Prioritizing tasks</p>\n          <p style=\"margin:0 0 16px;color:#151121;white-space:pre-wrap;\">${e.prioritizeTasks || '—'}</p>\n          <p style=\"margin:0 0 4px;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:0.5px;\">Organization example</p>\n          <p style=\"margin:0;color:#151121;white-space:pre-wrap;\">${e.organizedExample || '—'}</p>\n        </td></tr>\n      </table>\n    </td></tr>\n  </table>\n</body></html>`;\n\ndata.applicantHtml = `<!DOCTYPE html><html><body style=\"margin:0;padding:0;background:#f6f3fb;font-family:Arial,Helvetica,sans-serif;\">\n  <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f6f3fb;padding:32px 16px;\">\n    <tr><td align=\"center\">\n      <table role=\"presentation\" width=\"640\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #d1c4e9;\">\n        <tr><td style=\"background:#151121;padding:20px 28px;color:#fff;font-size:14px;letter-spacing:1px;\">N NATURAL HAIR STUDIO</td></tr>\n        <tr><td style=\"padding:28px;\">\n          <p style=\"margin:0 0 8px;font-size:13px;color:#e04b00;font-weight:bold;text-transform:uppercase;letter-spacing:1px;\">Application received</p>\n          <h1 style=\"margin:0 0 16px;font-size:28px;line-height:1.2;color:#151121;\">Thanks, ${e.fullName || 'there'}.</h1>\n          <p style=\"margin:0 0 16px;font-size:16px;line-height:1.5;color:#151121;\">We received your application for <strong>${e.role || 'an open role'}</strong> at N Natural Hair Studio.</p>\n          <p style=\"margin:0 0 16px;font-size:16px;line-height:1.5;color:#151121;\">Our team reviews every application carefully. If your experience looks like a fit, we will reach out about next steps.</p>\n          <p style=\"margin:0 0 24px;padding:14px 16px;background:#d1c4e9;border-radius:12px;font-size:14px;color:#151121;\">No action is needed from you right now. Keep an eye on <strong>${e.email}</strong> (and spam, just in case).</p>\n          <p style=\"margin:0;font-size:14px;line-height:1.5;color:#666;\">With care,<br/><strong style=\"color:#151121;\">N Natural Hair Studio</strong><br/>Careers Team</p>\n        </td></tr>\n        <tr><td style=\"padding:16px 28px;background:#151121;color:#c6c9ab;font-size:12px;\">nnaturalhairstudio.com</td></tr>\n      </table>\n    </td></tr>\n  </table>\n</body></html>`;\n\nconst out = { json: data };\nif (hasResume) {\n  out.binary = {\n    resume: {\n      data: String(resume.base64).replace(/^data:[^;]+;base64,/, ''),\n      mimeType: resumeMimeType,\n      fileName: resumeFileName || 'resume',\n    },\n  };\n}\nreturn [out];"
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Prepare Application",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Applications",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "submittedAt": "={{ $json.submittedAt }}",
+            "role": "={{ $json.role }}",
+            "fullName": "={{ $json.fullName }}",
+            "email": "={{ $json.email }}",
+            "phone": "={{ $json.phone }}",
+            "cityState": "={{ $json.cityState }}",
+            "localToMaryland": "={{ $json.localToMaryland }}",
+            "availableToStart": "={{ $json.availableToStart }}",
+            "availability": "={{ $json.availability }}",
+            "compensationOk": "={{ $json.compensationOk }}",
+            "yearsExperience": "={{ $json.yearsExperience }}",
+            "tools": "={{ $json.tools }}",
+            "supportedAreas": "={{ $json.supportedAreas }}",
+            "fitWhy": "={{ $json.fitWhy }}",
+            "prioritizeTasks": "={{ $json.prioritizeTasks }}",
+            "organizedExample": "={{ $json.organizedExample }}",
+            "linkedin": "={{ $json.linkedin }}",
+            "openToCall": "={{ $json.openToCall }}",
+            "referencesAvailable": "={{ $json.referencesAvailable }}",
+            "resumeFileName": "={{ $json.resumeFileName }}",
+            "resumeMimeType": "={{ $json.resumeMimeType }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            { "id": "submittedAt", "displayName": "submittedAt", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "role", "displayName": "role", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "fullName", "displayName": "fullName", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "email", "displayName": "email", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "phone", "displayName": "phone", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "cityState", "displayName": "cityState", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "localToMaryland", "displayName": "localToMaryland", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "availableToStart", "displayName": "availableToStart", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "availability", "displayName": "availability", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "compensationOk", "displayName": "compensationOk", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "yearsExperience", "displayName": "yearsExperience", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "tools", "displayName": "tools", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "supportedAreas", "displayName": "supportedAreas", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "fitWhy", "displayName": "fitWhy", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "prioritizeTasks", "displayName": "prioritizeTasks", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "organizedExample", "displayName": "organizedExample", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "linkedin", "displayName": "linkedin", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "openToCall", "displayName": "openToCall", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "referencesAvailable", "displayName": "referencesAvailable", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "resumeFileName", "displayName": "resumeFileName", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "resumeMimeType", "displayName": "resumeMimeType", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Append to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [520, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const prep = $('Prepare Application').first();\nreturn [{\n  json: { ...prep.json },\n  binary: prep.binary ? { ...prep.binary } : undefined,\n}];"
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "Restore Resume Binary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "justemail@nnaturalhairstudio.com",
+        "subject": "=New careers application: {{ $json.role || 'Open role' }} — {{ $json.fullName }}",
+        "emailType": "html",
+        "message": "={{ $json.internalHtml }}",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "resume"
+              }
+            ]
+          }
+        }
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "Internal Hiring Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1040, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Prepare Application').item.json.email }}",
+        "subject": "=We received your application — N Natural Hair Studio",
+        "emailType": "html",
+        "message": "={{ $('Prepare Application').item.json.applicantHtml }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "Applicant Acknowledgement",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1300, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true } }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "content": "## Setup after import\n1. Create a Google Sheet tab named **Applications** with header row matching the Append node columns.\n2. Paste the Spreadsheet ID into **Append to Google Sheet**.\n3. Connect **Google Sheets** + **Gmail** credentials on the nodes that need them.\n4. Confirm internal To on **Internal Hiring Alert** (`justemail@nnaturalhairstudio.com`).\n5. Activate the workflow and copy the **production** webhook URL into `WEBHOOK_URL` in `index.html`.\n6. Allow your Vercel domain in n8n CORS if browser submits fail.\n\nResume base64 is **not** written to Sheets (too large). It is attached on the internal email when present.",
+        "height": 460,
+        "width": 420
+      },
+      "id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-40, -40]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Application",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Application": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Restore Resume Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Resume Binary": {
+      "main": [
+        [
+          {
+            "node": "Internal Hiring Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Internal Hiring Alert": {
+      "main": [
+        [
+          {
+            "node": "Applicant Acknowledgement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Applicant Acknowledgement": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "n-natural-careers"
+  },
+  "tags": [
+    {
+      "name": "careers"
+    },
+    {
+      "name": "n-natural"
+    }
+  ]
+}

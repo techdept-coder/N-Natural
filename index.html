@@ -2003,7 +2003,7 @@
 
   <script>
     (function () {
-      var WEBHOOK_URL = "https://n8n.sparkprosalon.com/webhook-test/ffe79f55-df9d-416c-94c2-8eab31efc2c3";
+      var APPLY_URL = "/api/apply";
       var MAX_RESUME_BYTES = 4 * 1024 * 1024;
 
       var JOBS = {
@@ -2486,7 +2486,7 @@
               submittedAt: new Date().toISOString()
             };
 
-            return fetch(WEBHOOK_URL, {
+            return fetch(APPLY_URL, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload)

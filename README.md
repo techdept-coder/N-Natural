@@ -6,19 +6,26 @@ Careers landing page for N Natural Hair Studio. Static HTML/CSS/JS, ready for **
 
 - `index.html` — full page (nav → footer), job detail modals, apply form
 - `assets/` — images and icons from Figma
-- Form submits JSON to an n8n webhook (see `WEBHOOK_URL` in `index.html`)
+- `api/apply.js` — Vercel serverless proxy; reads `WEBHOOK_URL` from env and forwards applications to n8n
+- `n8n/careers-application-workflow.json` — importable n8n workflow (webhook → Sheets → emails)
+- Form submits JSON to `/api/apply` (webhook URL stays server-side)
 
 ## Local preview
 
-```bash
-# Python
-python3 -m http.server 8080
+Static page only:
 
-# or Node
-npx serve .
+```bash
+python3 -m http.server 8080
+# or: npx serve .
 ```
 
-Open http://localhost:8080
+Form submit needs the API route — use Vercel CLI:
+
+```bash
+cp .env.example .env.local
+# set WEBHOOK_URL=... in .env.local
+npx vercel dev
+```
 
 ## Deploy on Vercel
 
@@ -26,19 +33,48 @@ Open http://localhost:8080
 2. In [Vercel](https://vercel.com): **Add New Project** → import the repo
 3. Framework Preset: **Other**
 4. Root Directory: `.`
-5. Deploy
+5. **Settings → Environment Variables** → add:
 
-No build step required. Static files are served as-is.
+| Name | Value | Environments |
+|------|--------|--------------|
+| `WEBHOOK_URL` | Your n8n **production** webhook URL (e.g. `https://n8n.sparkprosalon.com/webhook/careers-application`) | Production, Preview |
 
-After deploy, allow your Vercel domain in the n8n webhook CORS settings so browser form submits succeed.
+6. Deploy (redeploy after adding/changing the env var)
+
+The browser never sees the n8n URL — `/api/apply` forwards POSTs using `WEBHOOK_URL`.
 
 ## Apply flow
 
 1. Open Roles list → **apply for this role** opens job detail modal  
 2. Detail → **apply for this role** opens application form  
-3. Submit → `POST` JSON to n8n (resume as base64 when attached)
+3. Submit → `POST` JSON to `/api/apply` → n8n (resume as base64 when attached)
 
 Job detail copy matches Figma Expanded Job View ([425:71](https://www.figma.com/design/1Ks8qI7IdHBlVIa2SenPsW/N-Natural-Hair-Salon?node-id=425-71)).
+
+## n8n workflow (import)
+
+Import [`n8n/careers-application-workflow.json`](n8n/careers-application-workflow.json) in n8n: **Workflows → Import from File**.
+
+Flow: **Webhook** → **Prepare Application** → **Append to Google Sheet** → **Internal Hiring Alert** (HTML) → **Applicant Acknowledgement** (HTML) → **Respond to Webhook**.
+
+### Google Sheet headers
+
+Import [`n8n/Applications-template.xlsx`](n8n/Applications-template.xlsx) into Google Sheets (**File → Import**), or create a tab named `Applications` with this header row (exact names):
+
+```
+submittedAt	role	fullName	email	phone	cityState	localToMaryland	availableToStart	availability	compensationOk	yearsExperience	tools	supportedAreas	fitWhy	prioritizeTasks	organizedExample	linkedin	openToCall	referencesAvailable	resumeFileName	resumeMimeType
+```
+
+Paste the spreadsheet ID into the **Append to Google Sheet** node (`REPLACE_WITH_SPREADSHEET_ID`). Resume **base64 is not stored** in Sheets (too large); filename/mime are saved, and the file is attached on the internal email when present.
+
+### Credentials after import
+
+1. Connect **Google Sheets OAuth2** on **Append to Google Sheet**
+2. Connect **Gmail OAuth2** on **Internal Hiring Alert** and **Applicant Acknowledgement**
+3. Confirm internal To (default: `justemail@nnaturalhairstudio.com`)
+4. Activate the workflow
+5. Copy the **production** webhook URL into the Vercel env var `WEBHOOK_URL` (not into `index.html`)
+6. Redeploy on Vercel so the function picks up the env var
 
 ## Webhook payload
 
@@ -66,5 +102,3 @@ Job detail copy matches Figma Expanded Job View ([425:71](https://www.figma.com/
   "submittedAt": "ISO-8601"
 }
 ```
-
-Change `WEBHOOK_URL` near the top of the `<script>` in `index.html` when moving off the n8n test webhook.
