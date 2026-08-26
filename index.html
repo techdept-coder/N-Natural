@@ -953,12 +953,15 @@
     .detail-intro p { margin-bottom: 16px; }
     .detail-intro p:last-child { margin-bottom: 0; }
     .detail-intro strong { font-weight: 700; }
-    .detail-intro ol {
+    .detail-intro ol,
+    .detail-intro ul {
       margin: 0 0 16px;
       padding-left: 1.5em;
     }
-    .detail-intro ol li { margin-bottom: 4px; }
-    .detail-intro ol li:last-child { margin-bottom: 0; }
+    .detail-intro ol li,
+    .detail-intro ul li { margin-bottom: 4px; }
+    .detail-intro ol li:last-child,
+    .detail-intro ul li:last-child { margin-bottom: 0; }
     .detail-boxes {
       display: flex;
       flex-wrap: wrap;
@@ -1938,6 +1941,24 @@
               <button type="button" class="btn btn--outline js-open-detail" data-role="booking-concierge">apply for this role</button>
             </div>
           </article>
+
+          <article class="job-card reveal">
+            <div class="job-card__main">
+              <div class="job-card__tags">
+                <span class="tag tag--muted">front of house</span>
+                <span class="tag">employee</span>
+              </div>
+              <h3>host &mdash; twst bar</h3>
+              <p class="job-card__desc">Set the tone for every client experience. Greet guests on arrival, manage the pace of the salon, and carry each visit from welcome through checkout.</p>
+              <div class="job-card__meta">
+                <span><img src="assets/icon-location.svg" alt="" width="11" height="14" /> TWST Bar</span>
+                <span><img src="assets/icon-pay.svg" alt="" width="15" height="11" /> $16.50 to $18/hr</span>
+              </div>
+            </div>
+            <div class="job-card__cta">
+              <button type="button" class="btn btn--lime js-open-detail" data-role="host">apply for this role</button>
+            </div>
+          </article>
         </div>
         <div class="jobs__note reveal">
           <p>Note for Brooklyn Applicants:<br />A valid NY Cosmetology License is required for all styling positions in our Brooklyn location.</p>
@@ -2643,6 +2664,73 @@
             { label: "Terms:", value: "Employee" },
             { label: "Reports to:", value: "Client Experience Curator" },
             { label: "Rate:", value: "$16.50\u2013$20/hour" }
+          ]
+        },
+        host: {
+          id: "host",
+          title: "host \u2014 twst bar",
+          formTitle: "Host \u2014 TWST Bar",
+          formBadge: "employee",
+          formLead: "Please complete this short application so we understand your availability, customer service experience, and fit for welcoming guests at TWST Bar.",
+          isAdmin: false,
+          tags: [
+            { text: "front of house", variant: "tag--muted" },
+            { text: "employee", variant: "" }
+          ],
+          meta: [
+            { icon: "assets/icon-location.svg", label: "TWST Bar" },
+            { icon: "assets/icon-pay.svg", label: "$16.50 to $18/hr" }
+          ],
+          introHtml:
+            "<p><strong>We do natural hair the TWST way: timeless natural styles. Culture. Community. Connection.</strong></p>" +
+            "<p>At TWST Bar, teamwork is a shared rhythm \u2014 intentional, collaborative, and essential to how we serve our clients and each other. We believe that when good-hearted, like-minded people come together with a shared purpose, great things are inevitable.</p>" +
+            "<p><strong>The TWST Bar 7 C\u2019s.</strong> Our culture is built on seven core values that guide everything we do:</p>" +
+            "<ul>" +
+            "<li>Culture</li>" +
+            "<li>Celebrate</li>" +
+            "<li>Curious</li>" +
+            "<li>Conversation</li>" +
+            "<li>Creative</li>" +
+            "<li>Community</li>" +
+            "<li>Care</li>" +
+            "</ul>" +
+            "<p>TWST Bar is more than a salon. It is a cultural homecoming, a place where natural beauty, meaningful connection, and joyful experiences come together every day.</p>" +
+            "<p>The Host is responsible for greeting clients when they arrive at the salon and ensuring they complete the necessary forms to get an appointment on the books. The Host sets the tone for the client experience and must exercise excellent customer service at all times. The Host manages the pace of the salon, including but not limited to client wait time, and facilitates the full-cycle client process.</p>",
+          willDo: [
+            "Use various modes of communication (calls, text, emails, etc.) to keep clients informed",
+            "Input appointments in applicable systems",
+            "Monitor TWST Bar phones",
+            "Greet clients and team members in a warm manner upon arrival",
+            "Escort clients from welcome to the beginning of their appointment",
+            "Execute the client checkout process with accuracy, ensuring all transactions, discounts, and adjustments are applied in accordance with company procedure",
+            "Secure client approval for final product photos and videos prior to the client\u2019s departure",
+            "Ensure the whiteboard is kept up to date with service providers and client appointment information",
+            "Communicate with the Booking team daily through phone calls, text, and the whiteboard",
+            "Ensure that all details are provided for client profiles",
+            "Take a picture of the client\u2019s final style and upload it to their profile",
+            "Fill out the closing sheet and KPI forms daily",
+            "Attend weekly Host meetings",
+            "Clean up area to salon standards before leaving",
+            "Review the daily schedule",
+            "Take in-house continued education classes",
+            "Attend 80% of team-wide meetings",
+            "Other duties as assigned"
+          ],
+          fit: [
+            "Driven to foster a sense of community and belonging",
+            "Punctual, with excellent customer service and interpersonal skills, and able to embrace challenges",
+            "Proficient in Microsoft Office Suite and Google Suite, and comfortable learning new software systems",
+            "Able to work well in a team",
+            "Skilled in customer service",
+            "Great with attention to detail"
+          ],
+          differentHtml:
+            "<p><strong>What makes this role different:</strong></p>" +
+            "<p>You are the first face our clients see and the last one before they leave. The Host holds the whole visit together \u2014 the welcome, the pace of the floor, the checkout, and the final photo \u2014 and protects the culture TWST Bar has built around natural hair care.</p>",
+          payFacts: [
+            { label: "Terms:", value: "Employee" },
+            { label: "Reports to:", value: "Salon Coordinator" },
+            { label: "Rate:", value: "$16.50\u2013$18/hour" }
           ]
         }
       };
