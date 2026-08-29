@@ -1,6 +1,14 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/page.js": {
+      "includeFiles": "index.html"
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/page" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
