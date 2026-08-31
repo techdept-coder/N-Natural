@@ -50,17 +50,21 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  // ?fresh skips the cache entirely, for checking a posting without waiting.
+  // Any other query string is just a different cache key, not a bypass.
+  var fresh = /[?&]fresh(=|&|$)/.test(String(req.url || ""));
+
   try {
     var jobs = transform.buildJobs(await fetchRows());
     if (!jobs.length) throw new Error("No open roles in the sheet");
     html = inject.injectJobs(html, jobs);
-    res.setHeader("Cache-Control",
+    res.setHeader("Cache-Control", fresh ? "no-store" :
       "public, s-maxage=" + CACHE_SECONDS + ", stale-while-revalidate=" + STALE_SECONDS);
     res.setHeader("X-Jobs-Source", "sheet:" + jobs.length);
   } catch (err) {
     // Built-in roles are the safety net; cache briefly so a blip doesn't stick.
     console.error("Falling back to built-in roles:", err && err.message);
-    res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=60");
+    res.setHeader("Cache-Control", fresh ? "no-store" : "public, s-maxage=60, stale-while-revalidate=60");
     res.setHeader("X-Jobs-Source", "fallback");
   }
 
