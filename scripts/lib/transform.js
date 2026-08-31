@@ -2,7 +2,6 @@ var resolveBrand = require("./brands").resolveBrand;
 
 var COL = {
   action: "What do you want to do?",
-  roleId: "Role ID",
   title: "Job Title",
   brand: "Brand / location",
   reportsTo: "Reports to",
@@ -27,6 +26,16 @@ var CATEGORY_ORDER = ["leadership", "stylist", "experienced", "junior", "entry-l
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
                   .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// The job title is the role's identity — the salon never types an id.
+// "Master / Experienced Stylist" -> "master-experienced-stylist"
+function slugify(s) {
+  return String(s == null ? "" : s).toLowerCase()
+    .replace(/['‘’“”]/g, "")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function tidy(line) { return String(line == null ? "" : line).replace(/\s+/g, " ").trim(); }
@@ -106,7 +115,7 @@ function rowToJob(row) {
   var title = tidy(row[COL.title]);
 
   var job = {
-    id: tidy(row[COL.roleId]),
+    id: slugify(title),
     title: title,
     formTitle: title,
     formBadge: terms.toLowerCase(),
@@ -134,22 +143,43 @@ function rowToJob(row) {
   return job;
 }
 
-// Last row per Role ID wins; a Close row removes the role entirely.
+// A role is identified by its job title and brand, so re-posting the same title
+// for the same brand updates that role rather than duplicating it. The last row
+// for a role wins; a Close row removes it entirely.
 function buildJobs(rows) {
-  var latest = {};
+  var latest = {};     // "title|brand" -> the most recent posting for that role
+  var closedAt = {};   // title -> row of the latest Close for it
   rows.forEach(function (row, index) {
-    var id = tidy(row[COL.roleId] || "");
-    if (!id) return;
-    latest[id] = { row: row, index: index };
+    var slug = slugify(row[COL.title]);
+    if (!slug) return;
+    // Closing skips the brand question, so a Close matches on job title alone.
+    if (String(row[COL.action] || "").toLowerCase().indexOf("close") >= 0) {
+      if (closedAt[slug] == null || index > closedAt[slug]) closedAt[slug] = index;
+      return;
+    }
+    var brandLabel = resolveBrand(row[COL.brand]).label;
+    latest[slug + "|" + brandLabel] = { row: row, index: index, slug: slug, brandLabel: brandLabel };
   });
 
-  var jobs = Object.keys(latest).map(function (id) {
-    var entry = latest[id];
-    var action = String(entry.row[COL.action] || "").toLowerCase();
-    if (action.indexOf("close") >= 0) return null;   // checked before anything is rendered
+  // A role is gone only if it was closed *after* it was last posted, so
+  // re-posting a title later brings it back.
+  var open = Object.keys(latest).map(function (key) { return latest[key]; })
+    .filter(function (entry) {
+      return closedAt[entry.slug] == null || closedAt[entry.slug] < entry.index;
+    });
+
+  // Same title under two brands (a Host at each, say) would collide on one id,
+  // so when that happens every clashing role carries its brand.
+  var slugCounts = {};
+  open.forEach(function (entry) {
+    slugCounts[entry.slug] = (slugCounts[entry.slug] || 0) + 1;
+  });
+
+  var jobs = open.map(function (entry) {
     var job = rowToJob(entry.row);
+    if (slugCounts[entry.slug] > 1) job.id = entry.slug + "-" + slugify(entry.brandLabel);
     job._index = entry.index;
-    return job.id && job.title ? job : null;
+    return job.title ? job : null;
   }).filter(Boolean);
 
   jobs.sort(function (a, b) {
