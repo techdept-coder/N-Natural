@@ -38,6 +38,30 @@ function slugify(s) {
     .replace(/^-+|-+$/g, "");
 }
 
+// Cards and detail headings are lowercased by CSS, but the application form
+// prints the title as typed — so normalise it rather than relying on the salon
+// to remember. Words already containing a capital are left exactly as written,
+// so "TWST Bar" and "N Natural" survive untouched.
+var SMALL_WORDS = ["a", "an", "and", "at", "but", "by", "for", "in", "nor",
+                   "of", "on", "or", "the", "to", "vs", "with"];
+var KNOWN_CAPS = { twst: "TWST" };
+
+function titleCase(s) {
+  var word = 0;
+  return String(s == null ? "" : s).split(/(\s+)/).map(function (part) {
+    if (!part.trim()) return part;
+    word++;
+    var m = part.match(/^([^a-zA-Z0-9]*)([a-zA-Z0-9]+)([\s\S]*)$/);
+    if (!m) return part;
+    var core = m[2], lower = core.toLowerCase();
+    if (KNOWN_CAPS[lower]) core = KNOWN_CAPS[lower];
+    else if (/[A-Z]/.test(core)) core = core;                       // typed deliberately
+    else if (word > 1 && SMALL_WORDS.indexOf(lower) >= 0) core = lower;
+    else core = core.charAt(0).toUpperCase() + core.slice(1);
+    return m[1] + core + m[3];
+  }).join("");
+}
+
 function tidy(line) { return String(line == null ? "" : line).replace(/\s+/g, " ").trim(); }
 
 // One item per line. A line starting lowercase is a wrapped continuation of the
@@ -113,14 +137,15 @@ function rowToJob(row) {
 
   var standout = toHtml(row[COL.standout]);
   var title = tidy(row[COL.title]);
+  var displayTitle = titleCase(title);
 
   var job = {
     id: slugify(title),
     title: title,
-    formTitle: title,
+    formTitle: displayTitle,
     formBadge: terms.toLowerCase(),
     formLead: "Please complete this short application so we understand your availability, experience, " +
-              "location, and fit for the " + title + " role.",
+              "location, and fit for the " + displayTitle + " role.",
     isAdmin: false,
     summary: tidy(row[COL.summary]),
     tags: tags,
