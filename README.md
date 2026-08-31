@@ -4,8 +4,10 @@ Careers landing page for N Natural Hair Studio. Static HTML/CSS/JS, ready for **
 
 ## Stack
 
-- `index.html` — full page (nav → footer), job detail modals, apply form
+- `template.html` — full page (nav → footer), job detail modals, apply form; served through `api/page.js`
 - `assets/` — images and icons from Figma
+- `api/page.js` — Vercel serverless function; merges job postings from the Google Sheet into `template.html`, cached ~5 min, falling back to the roles already in the file
+- `scripts/` — sheet reading, parsing and injection, plus `dev-server.js` for local preview
 - `api/apply.js` — Vercel serverless proxy; reads `WEBHOOK_URL` from env and forwards applications to n8n
 - `n8n/careers-application-workflow.json` — importable n8n workflow (webhook → Sheets → emails)
 - Form submits JSON to `/api/apply` (webhook URL stays server-side)

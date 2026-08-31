@@ -3,11 +3,14 @@
   "trailingSlash": false,
   "functions": {
     "api/page.js": {
-      "includeFiles": "index.html"
+      "includeFiles": "template.html"
     }
   },
   "rewrites": [
     { "source": "/", "destination": "/api/page" }
+  ],
+  "redirects": [
+    { "source": "/template", "destination": "/", "permanent": false }
   ],
   "headers": [
     {

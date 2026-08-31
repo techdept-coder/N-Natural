@@ -1,5 +1,5 @@
 // Serves the careers page with roles merged in from the postings sheet.
-// Falls back to the roles hard-coded in index.html if anything goes wrong,
+// Falls back to the roles hard-coded in template.html if anything goes wrong,
 // so the worst case is the page exactly as it was before this existed.
 var fs = require("fs");
 var path = require("path");
@@ -13,13 +13,13 @@ var FETCH_TIMEOUT_MS = 5000;
 
 function readTemplate() {
   var candidates = [
-    path.join(process.cwd(), "index.html"),
-    path.join(__dirname, "..", "index.html")
+    path.join(process.cwd(), "template.html"),
+    path.join(__dirname, "..", "template.html")
   ];
   for (var i = 0; i < candidates.length; i++) {
     if (fs.existsSync(candidates[i])) return fs.readFileSync(candidates[i], "utf8");
   }
-  throw new Error("index.html not found in the deployment");
+  throw new Error("template.html not found in the deployment");
 }
 
 async function fetchRows() {

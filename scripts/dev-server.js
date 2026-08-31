@@ -31,7 +31,7 @@ async function loadCsv() {
 }
 
 async function buildPage() {
-  var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  var html = fs.readFileSync(path.join(ROOT, "template.html"), "utf8");
   try {
     var jobs = transform.buildJobs(csv.toObjects(await loadCsv()));
     if (!jobs.length) throw new Error("Sheet contained no open roles");
@@ -47,7 +47,7 @@ http.createServer(async function (req, res) {
   var url = decodeURIComponent(req.url.split("?")[0]);
   console.log(req.method + " " + url);
 
-  if (url === "/" || url === "/index.html") {
+  if (url === "/") {
     var page = await buildPage();
     res.writeHead(200, { "Content-Type": TYPES[".html"], "Cache-Control": "no-store" });
     return res.end(page);
