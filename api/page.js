@@ -11,6 +11,13 @@ var CACHE_SECONDS = 300;          // ~5 minutes before a fresh read
 var STALE_SECONDS = 600;          // serve the old copy while refreshing behind the scenes
 var FETCH_TIMEOUT_MS = 5000;
 
+// Only these addresses can put a job on the site. Anyone else's submission still
+// lands in the sheet but is ignored here. Unset means no restriction.
+function allowedEmails() {
+  return String(process.env.ALLOWED_EMAILS || "")
+    .split(",").map(function (e) { return e.trim().toLowerCase(); }).filter(Boolean);
+}
+
 function readTemplate() {
   var candidates = [
     path.join(process.cwd(), "template.html"),
@@ -55,7 +62,7 @@ module.exports = async function handler(req, res) {
   var fresh = /[?&]fresh(=|&|$)/.test(String(req.url || ""));
 
   try {
-    var jobs = transform.buildJobs(await fetchRows());
+    var jobs = transform.buildJobs(await fetchRows(), { allowedEmails: allowedEmails() });
     if (!jobs.length) throw new Error("No open roles in the sheet");
     html = inject.injectJobs(html, jobs);
     res.setHeader("Cache-Control", fresh ? "no-store" :

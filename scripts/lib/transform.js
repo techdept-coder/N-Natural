@@ -1,6 +1,7 @@
 var resolveBrand = require("./brands").resolveBrand;
 
 var COL = {
+  email: "Email Address",
   action: "What do you want to do?",
   title: "Job Title",
   brand: "Brand / location",
@@ -64,6 +65,26 @@ function titleCase(s) {
 
 function tidy(line) { return String(line == null ? "" : line).replace(/\s+/g, " ").trim(); }
 
+// Generous ceilings — roughly three to five times the longest real posting — so
+// they never bite ordinary content but a pasted essay can't break the layout.
+var LIMITS = {
+  title: 80, terms: 40, rate: 40, reportsTo: 60, schedule: 60,
+  summary: 300, notes: 400, about: 2500, standout: 2500, list: 5000
+};
+
+// Truncates on a word boundary. Keeps line breaks, so bullet lists survive.
+function clamp(text, max) {
+  var s = String(text == null ? "" : text).trim();
+  if (s.length <= max) return s;
+  var cut = s.slice(0, max);
+  var space = cut.lastIndexOf(" ");
+  if (space > max * 0.6) cut = cut.slice(0, space);
+  return cut.replace(/[\s,;:.–—-]+$/, "") + "…";
+}
+
+// Same, for fields that render on a single line.
+function clampLine(text, max) { return clamp(tidy(text), max); }
+
 // One item per line. A line starting lowercase is a wrapped continuation of the
 // line above (the client's PDFs hard-wrap mid-sentence), so rejoin it.
 function splitList(text) {
@@ -112,8 +133,8 @@ function rateStrings(rate, unit) {
 
 function rowToJob(row) {
   var brand = resolveBrand(row[COL.brand]);
-  var terms = tidy(row[COL.terms]);
-  var rate = rateStrings(row[COL.rate], row[COL.rateUnit]);
+  var terms = clampLine(row[COL.terms], LIMITS.terms);
+  var rate = rateStrings(clampLine(row[COL.rate], LIMITS.rate), row[COL.rateUnit]);
 
   // Terms already supplies the second tag; drop it from the category answer if ticked twice.
   var categories = multi(row[COL.category]).filter(function (c) {
@@ -127,16 +148,17 @@ function rowToJob(row) {
 
   var meta = [{ icon: "assets/icon-location.svg", label: brand.label, w: 11, h: 14 }];
   if (rate.card) meta.push({ icon: "assets/icon-pay.svg", label: rate.card, w: 15, h: 11 });
-  var schedule = tidy(row[COL.schedule] || "");
+  var schedule = clampLine(row[COL.schedule], LIMITS.schedule);
   if (schedule) meta.push({ icon: "assets/icon-shift.svg", label: schedule, w: 15, h: 15 });
 
+  var reportsTo = clampLine(row[COL.reportsTo], LIMITS.reportsTo);
   var payFacts = [];
   if (terms) payFacts.push({ label: "Terms:", value: terms });
-  if (tidy(row[COL.reportsTo] || "")) payFacts.push({ label: "Reports to:", value: tidy(row[COL.reportsTo]) });
+  if (reportsTo) payFacts.push({ label: "Reports to:", value: reportsTo });
   if (rate.fact) payFacts.push({ label: "Rate:", value: rate.fact });
 
-  var standout = toHtml(row[COL.standout]);
-  var title = tidy(row[COL.title]);
+  var standout = toHtml(clamp(row[COL.standout], LIMITS.standout));
+  var title = clampLine(row[COL.title], LIMITS.title);
   var displayTitle = titleCase(title);
 
   var job = {
@@ -147,22 +169,23 @@ function rowToJob(row) {
     formLead: "Please complete this short application so we understand your availability, experience, " +
               "location, and fit for the " + displayTitle + " role.",
     isAdmin: false,
-    summary: tidy(row[COL.summary]),
+    summary: clampLine(row[COL.summary], LIMITS.summary),
     tags: tags,
     meta: meta,
     introHtml: '<p class="section-label">About us</p>' + brand.aboutUs +
-               '<p class="section-label">About the role</p>' + toHtml(row[COL.about]),
+               '<p class="section-label">About the role</p>' + toHtml(clamp(row[COL.about], LIMITS.about)),
     willDoLabel: "Responsibilities/Tasks:",
-    willDo: splitList(row[COL.responsibilities]),
-    fit: splitList(row[COL.requirements]),
+    willDo: splitList(clamp(row[COL.responsibilities], LIMITS.list)),
+    fit: splitList(clamp(row[COL.requirements], LIMITS.list)),
     _category: (categories[0] || "").toLowerCase(),
     _pinned: isTruthy(row[COL.pinned])
   };
 
-  var benefits = splitList(row[COL.benefits]);
+  var benefits = splitList(clamp(row[COL.benefits], LIMITS.list));
   if (benefits.length) job.benefits = benefits;
   if (standout) job.differentHtml = "<p><strong>What makes this role different:</strong></p>" + standout;
-  if (tidy(row[COL.notes] || "")) job.payLine = tidy(row[COL.notes]);
+  var notes = clampLine(row[COL.notes], LIMITS.notes);
+  if (notes) job.payLine = notes;
   if (payFacts.length) job.payFacts = payFacts;
 
   return job;
@@ -171,12 +194,19 @@ function rowToJob(row) {
 // A role is identified by its job title and brand, so re-posting the same title
 // for the same brand updates that role rather than duplicating it. The last row
 // for a role wins; a Close row removes it entirely.
-function buildJobs(rows) {
+function buildJobs(rows, options) {
+  var allowed = (options && options.allowedEmails) || [];
+  // An empty list allows everyone, so an unset variable can't lock the page out.
+  function permitted(row) {
+    if (!allowed.length) return true;
+    return allowed.indexOf(String(row[COL.email] || "").trim().toLowerCase()) >= 0;
+  }
+
   var latest = {};     // "title|brand" -> the most recent posting for that role
   var closedAt = {};   // title -> row of the latest Close for it
   rows.forEach(function (row, index) {
     var slug = slugify(row[COL.title]);
-    if (!slug) return;
+    if (!slug || !permitted(row)) return;   // submissions from anyone else are ignored
     // Closing skips the brand question, so a Close matches on job title alone.
     if (String(row[COL.action] || "").toLowerCase().indexOf("close") >= 0) {
       if (closedAt[slug] == null || index > closedAt[slug]) closedAt[slug] = index;
@@ -219,4 +249,7 @@ function buildJobs(rows) {
   return jobs;
 }
 
-module.exports = { buildJobs: buildJobs, rowToJob: rowToJob, splitList: splitList, esc: esc, COL: COL };
+module.exports = {
+  buildJobs: buildJobs, rowToJob: rowToJob, splitList: splitList,
+  esc: esc, slugify: slugify, COL: COL, LIMITS: LIMITS
+};

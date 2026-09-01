@@ -12,6 +12,8 @@ var PORT = Number(process.env.PORT || 8080);
 var SHEET_ID = process.env.SHEET_ID || "";
 var SHEET_GID = process.env.SHEET_GID || "0";
 var USE_FIXTURE = process.env.USE_FIXTURE === "1";
+var ALLOWED = String(process.env.ALLOWED_EMAILS || "")
+  .split(",").map(function (e) { return e.trim().toLowerCase(); }).filter(Boolean);
 
 var TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript",
   ".svg": "image/svg+xml", ".png": "image/png", ".woff": "font/woff", ".json": "application/json" };
@@ -33,7 +35,7 @@ async function loadCsv() {
 async function buildPage() {
   var html = fs.readFileSync(path.join(ROOT, "template.html"), "utf8");
   try {
-    var jobs = transform.buildJobs(csv.toObjects(await loadCsv()));
+    var jobs = transform.buildJobs(csv.toObjects(await loadCsv()), { allowedEmails: ALLOWED });
     if (!jobs.length) throw new Error("Sheet contained no open roles");
     console.log("  → rendered " + jobs.length + " role(s): " + jobs.map(function (j) { return j.id; }).join(", "));
     return inject.injectJobs(html, jobs);
