@@ -18,3 +18,6 @@ Thumbs.db
 
 # Vercel
 .vercel/
+
+# Generated preview output
+scripts/fixtures/preview.html

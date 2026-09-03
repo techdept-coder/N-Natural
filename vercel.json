@@ -1,6 +1,17 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/page.js": {
+      "includeFiles": "template.html"
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/page" }
+  ],
+  "redirects": [
+    { "source": "/template", "destination": "/", "permanent": false }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
